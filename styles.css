@@ -20,6 +20,7 @@ transition: all 200ms ease-in-out;
 	
   }
 
+
 /* width */
 ::-webkit-scrollbar {
   width: 10px;
@@ -344,7 +345,10 @@ transition: all 200ms ease-in-out;
 	bottom: 0;
 }
 
-@media screen and (max-width: 900px) {
+@media screen and (max-width: 800px) {
+	
+	
+
 
 #Achievement {
 	background:#0179F8;
