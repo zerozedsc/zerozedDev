@@ -1,5 +1,6 @@
 /* CSS Document */
 @import url('https://fonts.googleapis.com/css?family=Lacquer|Lemonada|Modak|Nunito+Sans|Oswald|PT+Sans+Narrow|Source+Sans+Pro|Sriracha&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Arimo|Bitter|Cabin|Fira+Sans|Inconsolata|Lato:700|Mukta|Noto+Sans+KR|PT+Sans+Narrow|Pacifico|Rubik|Work+Sans&display=swap');
 
 html {
   height: 100%;
@@ -108,7 +109,7 @@ transition: all 200ms ease-in-out;
 	background-position: center;
 	height:2400px;
 	font:italic, bold, oblique;
-	font-family:'Oswald';
+	font-family:'Lato';
 	color: white;
 }
 
@@ -118,7 +119,7 @@ transition: all 200ms ease-in-out;
 	text-align: center;
 	object-position: center;
 	text-shadow: 2px 3px black ;
-	font-family:berlin sans fb ;
+	font-family:'Pacifico' ;
 	
 }
 
@@ -128,7 +129,7 @@ transition: all 200ms ease-in-out;
 	text-align: center;
 	object-position: center;
 	text-shadow: 2px 3px black ;
-	font-family:Arial black;
+	
 }
 
 
@@ -288,7 +289,6 @@ transition: all 200ms ease-in-out;
 	text-align: center;
 	object-position: center;
 	text-shadow: 2px 3px black ;
-	font-family:berlin sans fb ;
 }
 
 .card-content{
