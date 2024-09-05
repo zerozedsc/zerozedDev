@@ -172,3 +172,46 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
+// Experience section folding
+function toggleVisibility(element) {
+    var section = element.nextElementSibling;
+    section.classList.toggle("expanded");
+    element.classList.toggle("expanded");
+
+    // Reset animation
+    element.classList.remove("animate-box");
+    void element.offsetWidth; // Trigger reflow
+    element.classList.add("animate-box");
+
+    // Remove blinking class if section is expanded
+    if (section.classList.contains("expanded")) {
+        element.classList.remove("blinking");
+        element.classList.add("hover-color");
+    } else {
+        element.classList.remove("hover-color");
+        element.classList.add("blinking");
+        setTimeout(function () {
+            element.classList.remove("blinking");
+        }, 2000); // Blinking for 2 seconds
+    }
+}
+
+// Initial setup to add blinking class if section is not expanded
+// document.addEventListener("DOMContentLoaded", function () {
+//     var headers = document.querySelectorAll(".experience-h2");
+//     headers.forEach(function (header) {
+//         var section = header.nextElementSibling;
+//         if (!section.classList.contains("expanded")) {
+//             setTimeout(function () {
+//                 setInterval(function () {
+//                     if (!section.classList.contains("expanded")) {
+//                         header.classList.add("blinking");
+//                         setTimeout(function () {
+//                             header.classList.remove("blinking");
+//                         }, 3500); // Blinking for 2 seconds
+//                     }
+//                 }, 10000); // Wait 5 seconds after blinking for 2 seconds
+//             }, 10000); // Initial delay of 10 seconds
+//         }
+//     });
+// });

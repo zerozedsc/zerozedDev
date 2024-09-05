@@ -23,5 +23,6 @@ bin-release/
 # files
 js/firebase.js
 template.html
+firebasecmd.txt
 
 

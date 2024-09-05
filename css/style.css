@@ -476,6 +476,57 @@ figure figcaption {
   /* Blinking cursor effect */
 }
 
+.experience-section {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease-out;
+}
+
+.experience-section.expanded {
+  max-height: 1000px;
+  /* Adjust this value as needed */
+}
+
+.experience-h2 {
+  cursor: pointer;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.experience-h2:hover {
+  color: #007bff;
+  /* Change to your desired hover color */
+  transform: scale(1.05);
+}
+
+.experience-h2 i {
+  transition: transform 0.3s ease;
+}
+
+.experience-h2.expanded i {
+  transform: rotate(180deg);
+}
+
+@keyframes blink {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
+}
+
+.blinking {
+  animation: blink 1s step-start infinite;
+}
+
+.hover-color {
+  color: #007bff;
+  /* Change to your desired hover color */
+}
+
 @media (max-width: 768px) {
   #text-coder-style {
     white-space: normal;
