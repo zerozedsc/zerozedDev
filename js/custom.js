@@ -1,160 +1,174 @@
-/******************************************
-    Version: 1.0
-/****************************************** */
-
-(function($) {
-    "use strict";
-
-	
-	// Smooth scrolling using jQuery easing
-	  $('a.js-scroll-trigger[href*="#"]:not([href="#"])').click(function() {
-		if (location.pathname.replace(/^\//, '') == this.pathname.replace(/^\//, '') && location.hostname == this.hostname) {
-		  var target = $(this.hash);
-		  target = target.length ? target : $('[name=' + this.hash.slice(1) + ']');
-		  if (target.length) {
-			$('html, body').animate({
-			  scrollTop: (target.offset().top - 54)
-			}, 1000, "easeInOutExpo");
-			return false;
-		  }
-		}
-	  });
-	
-    // Closes responsive menu when a scroll trigger link is clicked
-	  $('.js-scroll-trigger').click(function() {
-		$('.navbar-collapse').collapse('hide');
-	  });
-
-	// Activate scrollspy to add active class to navbar items on scroll
-	  $('body').scrollspy({
-		target: '#mainNav',
-		offset: 56
-	  });
-
-	// Collapse Navbar
-	  var navbarCollapse = function() {
-		if ($("#mainNav").offset().top > 100) {
-		  $("#mainNav").addClass("navbar-shrink");
-		} else {
-		  $("#mainNav").removeClass("navbar-shrink");
-		}
-	  };
-	// Collapse now if page is not at top
-	  navbarCollapse();
-	  // Collapse the navbar when page is scrolled
-	  $(window).scroll(navbarCollapse);
-
-	// Hide navbar when modals trigger
-	  $('.portfolio-modal').on('show.bs.modal', function(e) {
-		$(".navbar").addClass("d-none");
-	  })
-	  $('.portfolio-modal').on('hidden.bs.modal', function(e) {
-		$(".navbar").removeClass("d-none");
-	  })
-
-    // Scroll to top  		
-	if ($('#scroll-to-top').length) {
-		var scrollTrigger = 100, // px
-			backToTop = function () {
-				var scrollTop = $(window).scrollTop();
-				if (scrollTop > scrollTrigger) {
-					$('#scroll-to-top').addClass('show');
-				} else {
-					$('#scroll-to-top').removeClass('show');
-				}
-			};
-		backToTop();
-		$(window).on('scroll', function () {
-			backToTop();
-		});
-		$('#scroll-to-top').on('click', function (e) {
-			e.preventDefault();
-			$('html,body').animate({
-				scrollTop: 0
-			}, 700);
-		});
-	}
-	
-	// Banner 
-	
-    $('.heading').height( $(window).height() );
-	$('.parallaxie').parallaxie();
-	
-    // LOADER
-    $(window).load(function() {
-        $("#preloader").on(500).fadeOut();
-        $(".preloader").on(600).fadeOut("slow");
-    });
-
-	// Gallery Filter
-        var Container = $('.container');
-        Container.imagesLoaded(function () {
-            var portfolio = $('.gallery-menu');
-            portfolio.on('click', 'button', function () {
-                $(this).addClass('active').siblings().removeClass('active');
-                var filterValue = $(this).attr('data-filter');
-                $grid.isotope({
-                    filter: filterValue
-                });
-            });
-            var $grid = $('.gallery-list').isotope({
-                itemSelector: '.gallery-grid'
-            });
-
+// navbar function
+// Function to handle scrolling
+function scrollToSection(sectionId) {
+    const targetSection = document.querySelector(`[data-section="${sectionId}"]`);
+    if (targetSection) {
+        window.scrollTo({
+            top: targetSection.offsetTop,
+            behavior: 'smooth'
         });
-	
-    // FUN FACTS   
+    }
+}
 
-    function count($this) {
-        var current = parseInt($this.html(), 10);
-        current = current + 50; /* Where 50 is increment */
-        $this.html(++current);
-        if (current > $this.data('count')) {
-            $this.html($this.data('count'));
+// Function to handle navigation
+function handleNavigation(sectionId) {
+    // Check if we're already on index.html
+    if (window.location.pathname.endsWith('index.html') || window.location.pathname === '/' || window.location.pathname === '') {
+        scrollToSection(sectionId);
+    } else {
+        // Redirect to index.html with the section parameter
+        window.location.href = `index.html?section=${sectionId}`;
+    }
+}
+
+// Fetch and load navbar content
+fetch('navbar.html')
+    .then(response => response.text())
+    .then(data => {
+        document.getElementById('colorlib-aside').innerHTML = data;
+
+        // Add click event listeners to navigation links
+        document.querySelectorAll('a[data-nav-section]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const sectionId = this.getAttribute('data-nav-section');
+                handleNavigation(sectionId);
+            });
+        });
+    })
+    .catch(error => console.error('Error loading navbar:', error));
+
+// Handle URL parameters to scroll to the correct section on page load
+window.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const sectionId = urlParams.get('section');
+    if (sectionId) {
+        // Scroll to the section after a brief delay to ensure the page has fully loaded
+        setTimeout(() => scrollToSection(sectionId), 100); // Adjust the delay if needed
+    }
+});
+
+
+// Typing effect text-coder-style
+const texts = [
+    "Python Lover",
+    "Information Intelligence Engineering Student",
+    "ML/AI Enthusiast",
+    "Ready to learn new technology",
+];
+const typingSpeed = 100; // Adjust typing speed
+const pauseTime = 2000; // Time to pause at the end of each text
+let textIndex = 0;
+let charIndex = 0;
+
+function typeText() {
+    const textElement = document.getElementById('text-coder-style');
+    const currentText = texts[textIndex];
+
+    if (charIndex < currentText.length) {
+        textElement.innerHTML = `> print("${currentText.substring(0, charIndex + 1)}")`;
+        charIndex++;
+        setTimeout(typeText, typingSpeed);
+    } else {
+        setTimeout(() => {
+            deleteText();
+        }, pauseTime);
+    }
+}
+
+function deleteText() {
+    const textElement = document.getElementById('text-coder-style');
+    const currentText = texts[textIndex];
+
+    if (charIndex > 0) {
+        textElement.innerHTML = `> print("${currentText.substring(0, charIndex - 1)}")`;
+        charIndex--;
+        setTimeout(deleteText, typingSpeed);
+    } else {
+        textIndex = (textIndex + 1) % texts.length;
+        setTimeout(typeText, typingSpeed);
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    const textElement = document.getElementById('text-coder-style');
+    if (textElement) {
+        typeText();
+    }
+});
+
+// github projects counter
+function getProjectsCount(counterDiv, repoCount) {
+    // Create the counter element
+    const counterElement = document.createElement('span');
+    counterElement.id = 'projects-counter';
+    counterElement.className = 'colorlib-counter js-counter';
+    counterElement.setAttribute('data-from', '0');
+    counterElement.setAttribute('data-to', repoCount);
+    counterElement.setAttribute('data-speed', '5000');
+    counterElement.setAttribute('data-refresh-interval', '50');
+    counterElement.textContent = repoCount; // Update the text content
+
+    // Create the label element
+    const labelElement = document.createElement('span');
+    labelElement.className = 'colorlib-counter-label';
+    labelElement.textContent = 'Projects';
+
+    // Append the counter and label elements to the div
+    counterDiv.appendChild(counterElement);
+    counterDiv.appendChild(labelElement);
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    try {
+        const counterDiv = document.getElementById('projects-counter-div');
+        if (!counterDiv) {
+            throw new Error('Element with id "projects-counter-div" not found');
+        }
+
+        const username = 'zerozedsc'; // Replace with your GitHub username
+        const url = `https://api.github.com/users/${username}`;
+
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const repoCount = data.public_repos;
+                getProjectsCount(counterDiv, repoCount);
+                // console.log(`Repo count: ${repoCount}`); // Debugging log
+            })
+            .catch(error => {
+                console.error('Error fetching GitHub data:', error);
+                getProjectsCount(counterDiv, 0);
+            });
+    } catch (error) {
+
+    }
+});
+
+// Change picture of colorlib-counter when in mobile device
+document.addEventListener("DOMContentLoaded", function () {
+    function isMobileDevice() {
+        return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1) || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    }
+
+    function updateBackgroundImage() {
+        const counterDiv = document.getElementById('colorlib-counter');
+        if (window.matchMedia("(orientation: portrait)").matches) {
+            counterDiv.style.backgroundImage = "url('images/cover_bg_1mobile.jpg')";
         } else {
-            setTimeout(function() {
-                count($this)
-            }, 30);
+            counterDiv.style.backgroundImage = "url('images/cover_bg_1.jpg')";
         }
     }
-    $(".stat_count, .stat_count_download").each(function() {
-        $(this).data('count', parseInt($(this).html(), 10));
-        $(this).html('0');
-        count($(this));
-    });
 
-    // CONTACT
-    jQuery(document).ready(function() {
-        $('#contactform').submit(function() {
-            var action = $(this).attr('action');
-            $("#message").slideUp(750, function() {
-                $('#message').hide();
-                $('#submit')
-                    .after('<img src="images/ajax-loader.gif" class="loader" />')
-                    .attr('disabled', 'disabled');
-                $.post(action, {
-                        first_name: $('#first_name').val(),
-                        last_name: $('#last_name').val(),
-                        email: $('#email').val(),
-                        phone: $('#phone').val(),
-                        select_service: $('#select_service').val(),
-                        select_price: $('#select_price').val(),
-                        comments: $('#comments').val(),
-                        verify: $('#verify').val()
-                    },
-                    function(data) {
-                        document.getElementById('message').innerHTML = data;
-                        $('#message').slideDown('slow');
-                        $('#contactform img.loader').fadeOut('slow', function() {
-                            $(this).remove()
-                        });
-                        $('#submit').removeAttr('disabled');
-                        if (data.match('success') != null) $('#contactform').slideUp('slow');
-                    }
-                );
-            });
-            return false;
-        });
-    });
+    if (isMobileDevice()) {
+        updateBackgroundImage();
+        window.addEventListener("resize", updateBackgroundImage);
+        window.addEventListener("orientationchange", updateBackgroundImage);
+    }
+});
 
-})(jQuery);
