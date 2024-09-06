@@ -1,13 +1,18 @@
+import { defineConfig } from 'vite';
+
 export default defineConfig({
     define: {
-        'process.env': {
-            FIREBASE_API_KEY: JSON.stringify(import.meta.env.FIREBASE_API_KEY),
-            FIREBASE_AUTH_DOMAIN: JSON.stringify(import.meta.env.FIREBASE_AUTH_DOMAIN),
-            FIREBASE_PROJECT_ID: JSON.stringify(import.meta.env.FIREBASE_PROJECT_ID),
-            FIREBASE_STORAGE_BUCKET: JSON.stringify(import.meta.env.FIREBASE_STORAGE_BUCKET),
-            FIREBASE_MESSAGING_SENDER_ID: JSON.stringify(import.meta.env.FIREBASE_MESSAGING_SENDER_ID),
-            FIREBASE_APP_ID: JSON.stringify(import.meta.env.FIREBASE_APP_ID),
-            FIREBASE_MEASUREMENT_ID: JSON.stringify(import.meta.env.FIREBASE_MEASUREMENT_ID),
+        'import.meta.env': {
+            VITE_FIREBASE_API_KEY: JSON.stringify(process.env.VITE_FIREBASE_API_KEY),
+            VITE_FIREBASE_AUTH_DOMAIN: JSON.stringify(process.env.VITE_FIREBASE_AUTH_DOMAIN),
+            VITE_FIREBASE_PROJECT_ID: JSON.stringify(process.env.VITE_FIREBASE_PROJECT_ID),
+            VITE_FIREBASE_STORAGE_BUCKET: JSON.stringify(process.env.VITE_FIREBASE_STORAGE_BUCKET),
+            VITE_FIREBASE_MESSAGING_SENDER_ID: JSON.stringify(process.env.VITE_FIREBASE_MESSAGING_SENDER_ID),
+            VITE_FIREBASE_APP_ID: JSON.stringify(process.env.VITE_FIREBASE_APP_ID),
+            VITE_FIREBASE_MEASUREMENT_ID: JSON.stringify(process.env.VITE_FIREBASE_MEASUREMENT_ID),
         },
+    },
+    build: {
+        target: 'esnext', // Ensure ESM output
     },
 });
