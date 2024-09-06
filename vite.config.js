@@ -14,5 +14,18 @@ export default defineConfig({
     },
     build: {
         target: 'esnext', // Ensure ESM output
+        outDir: 'dist',
+        assetsDir: 'assets',
+        rollupOptions: {
+            input: {
+                main: 'index.html', // Ensure the main entry point is correctly specified
+            },
+            output: {
+                entryFileNames: 'assets/[name].js',
+                chunkFileNames: 'assets/[name].js',
+                assetFileNames: 'assets/[name].[ext]',
+            },
+        },
     },
 });
+
