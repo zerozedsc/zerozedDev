@@ -1,19 +1,19 @@
 import { defineConfig } from 'vite';
-import fs from 'fs';
-import path from 'path';
+const path = require('path');
+const fs = require('fs');
 
-const copyFilesPlugin = () => {
+const copyFilesPlugin = (filename, distdir) => {
     return {
         name: 'copy-files',
         closeBundle() {
-            const srcPath = path.resolve(__dirname, 'navbar.html');
-            const destPath = path.resolve(__dirname, 'dist', 'navbar.html');
+            const srcPath = path.resolve(__dirname, filename);
+            const destPath = path.resolve(__dirname, distdir, path.basename(filename));
 
             if (fs.existsSync(srcPath)) {
                 fs.copyFileSync(srcPath, destPath);
-                console.log('navbar.html copied to dist');
+                console.log(`${filename} copied to ${distdir}`);
             } else {
-                console.error('navbar.html not found');
+                console.error(`File not found: ${srcPath}`);
             }
         }
     };
@@ -74,7 +74,8 @@ export default defineConfig({
     },
     plugins: [
         jsToBottomNoModule(),
-        copyFilesPlugin()
+        copyFilesPlugin('navbar.html', 'dist'),
+        copyFilesPlugin("js/modernizr-2.6.2.min.js", 'dist/js'),
     ],
     publicDir: '', // Not using 'public' directory
 });
