@@ -83,6 +83,7 @@ export default defineConfig({
             VITE_FIREBASE_MESSAGING_SENDER_ID: JSON.stringify(process.env.VITE_FIREBASE_MESSAGING_SENDER_ID),
             VITE_FIREBASE_APP_ID: JSON.stringify(process.env.VITE_FIREBASE_APP_ID),
             VITE_FIREBASE_MEASUREMENT_ID: JSON.stringify(process.env.VITE_FIREBASE_MEASUREMENT_ID),
+            VITE_FIREBASE_SERVICE_ACCOUNT: JSON.stringify(process.env.VITE_FIREBASE_SERVICE_ACCOUNT),
         },
     },
     build: {
