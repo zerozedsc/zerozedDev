@@ -483,7 +483,7 @@ figure figcaption {
 }
 
 .experience-section.expanded {
-  max-height: 1000px;
+  max-height: none;
   /* Adjust this value as needed */
 }
 
@@ -1158,6 +1158,16 @@ body.offcanvas .colorlib-nav-toggle {
   overflow: visible;
 }
 
+@keyframes fillAnimation {
+  from {
+    width: 0%;
+  }
+
+  to {
+    width: var(--target-width);
+  }
+}
+
 .progress-bar {
   background: #2c98f0;
   -webkit-box-shadow: none;
@@ -1173,6 +1183,10 @@ body.offcanvas .colorlib-nav-toggle {
   -moz-border-radius: 8px;
   -ms-border-radius: 8px;
   border-radius: 8px;
+}
+
+.progress-bar.animate {
+  animation: fillAnimation 2s ease-in-out forwards;
 }
 
 .progress-bar:after {

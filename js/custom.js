@@ -175,6 +175,11 @@ document.addEventListener("DOMContentLoaded", function () {
 // Experience section folding
 function toggleVisibility(element) {
     var section = element.nextElementSibling;
+    if (section.classList.contains("expanded")) {
+        section.style.maxHeight = null;
+    } else {
+        section.style.maxHeight = section.scrollHeight + "px";
+    }
     section.classList.toggle("expanded");
     element.classList.toggle("expanded");
 
@@ -184,34 +189,65 @@ function toggleVisibility(element) {
     element.classList.add("animate-box");
 
     // Remove blinking class if section is expanded
-    if (section.classList.contains("expanded")) {
-        element.classList.remove("blinking");
-        element.classList.add("hover-color");
-    } else {
-        element.classList.remove("hover-color");
-        element.classList.add("blinking");
-        setTimeout(function () {
-            element.classList.remove("blinking");
-        }, 2000); // Blinking for 2 seconds
-    }
+    // if (section.classList.contains("expanded")) {
+    //     element.classList.remove("blinking");
+    //     element.classList.add("hover-color");
+    // } else {
+    //     element.classList.remove("hover-color");
+    //     element.classList.add("blinking");
+    //     setTimeout(function () {
+    //         element.classList.remove("blinking");
+    //     }, 2000); // Blinking for 2 seconds
+    // }
 }
 
-// Initial setup to add blinking class if section is not expanded
-// document.addEventListener("DOMContentLoaded", function () {
-//     var headers = document.querySelectorAll(".experience-h2");
-//     headers.forEach(function (header) {
-//         var section = header.nextElementSibling;
-//         if (!section.classList.contains("expanded")) {
-//             setTimeout(function () {
-//                 setInterval(function () {
-//                     if (!section.classList.contains("expanded")) {
-//                         header.classList.add("blinking");
-//                         setTimeout(function () {
-//                             header.classList.remove("blinking");
-//                         }, 3500); // Blinking for 2 seconds
-//                     }
-//                 }, 10000); // Wait 5 seconds after blinking for 2 seconds
-//             }, 10000); // Initial delay of 10 seconds
-//         }
-//     });
-// });
+// animation for experience progress bar
+document.addEventListener("DOMContentLoaded", function () {
+    var skillsDivs = document.querySelectorAll(".animate-box.skills-div");
+
+    skillsDivs.forEach(function (skillsDiv) {
+        // Check if the skillsDiv itself has the data-animate-effect attribute
+        var animatedElement = skillsDiv.matches("[data-animate-effect*='fade']") ? skillsDiv : skillsDiv.querySelector("[data-animate-effect*='fade']");
+        var progressWraps = skillsDiv.querySelectorAll(".progress-wrap");
+
+        progressWraps.forEach(function (wrap, index) {
+            var progressBar = wrap.querySelector(".progress-bar");
+            progressBar.style.width = "0%";
+            progressBar.querySelector("span").innerText = "0%";
+        })
+
+
+        if (animatedElement) {
+            animatedElement.addEventListener("animationend", function () {
+
+                var delay = 1000; // Initial delay for the first progress bar
+
+                progressWraps.forEach(function (wrap, index) {
+                    var progressBar = wrap.querySelector(".progress-bar");
+                    var value = progressBar.getAttribute("aria-valuenow");
+
+                    // Delay the animation for each progress bar
+                    setTimeout(function () {
+                        console.log("Animating progress bar for:", wrap.querySelector("h3").innerText);
+                        progressBar.style.setProperty('--target-width', value + '%');
+                        progressBar.classList.add("animate"); // Add the animate class to trigger the animation
+                        progressBar.style.width = value + "%"; // Set the target width
+                        var currentValue = 0;
+                        var increment = value / 100; // Adjust the increment as needed
+                        var interval = setInterval(function () {
+                            currentValue += increment;
+                            if (currentValue >= value) {
+                                currentValue = value;
+                                clearInterval(interval);
+                            }
+                            progressBar.querySelector("span").innerText = Math.round(currentValue) + "%";
+                        }, 20);
+                    }, delay);
+
+                    // Increase the delay for the next progress bar
+                    delay += 600; // Adjust the delay as needed
+                });
+            }, { once: true }); // Ensure the event listener is called only once
+        }
+    });
+});
