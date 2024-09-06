@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite';
 const path = require('path');
-const fs = require('fs');
+const fs = require('fs-extra');
 
 const copyFilesPlugin = (filename, distdir) => {
     return {
@@ -14,6 +14,45 @@ const copyFilesPlugin = (filename, distdir) => {
                 console.log(`${filename} copied to ${distdir}`);
             } else {
                 console.error(`File not found: ${srcPath}`);
+            }
+        }
+    };
+};
+
+const rootDir = path.resolve(__dirname);
+const distDir = path.join(rootDir, 'dist');
+
+// List of folders and files to copy
+const itemsToCopy = [
+    'css',
+    'fonts',
+    'images',
+    'js',
+    'sass',
+    'tstex_modules',
+    'index.html',
+    'navbar.html'
+];
+
+const copy2Dist = () => {
+    return {
+        name: 'copy-to-dist',
+        closeBundle() {
+            try {
+                itemsToCopy.forEach(async (item) => {
+                    const srcPath = path.join(rootDir, item);
+                    const destPath = path.join(distDir, item);
+
+                    // Check if the item is a directory
+                    if (fs.lstatSync(srcPath).isDirectory()) {
+                        fs.copySync(srcPath, destPath);
+                    } else {
+                        fs.copyFileSync(srcPath, destPath);
+                    }
+                });
+                console.log('Files and folders copied successfully!');
+            } catch (err) {
+                console.error('Error copying files:', err);
             }
         }
     };
@@ -47,35 +86,14 @@ export default defineConfig({
         },
     },
     build: {
-        target: 'esnext',
+        // target: 'esnext',
         outDir: 'dist',
-        assetsDir: '', // Do not create an 'assets' folder in 'dist'
-        rollupOptions: {
-            input: {
-                main: 'index.html',
-            },
-            output: {
-                entryFileNames: 'js/[name].js',
-                chunkFileNames: 'js/[name].js',
-                assetFileNames: (assetInfo) => {
-                    if (assetInfo.name?.endsWith('.css')) {
-                        return 'css/[name].[ext]';
-                    }
-                    if (assetInfo.name?.endsWith('.jpg') || assetInfo.name?.endsWith('.png')) {
-                        return 'images/[name].[ext]';
-                    }
-                    if (assetInfo.name?.endsWith('.eot') || assetInfo.name?.endsWith('.ttf') || assetInfo.name?.endsWith('.woff') || assetInfo.name?.endsWith('.woff2')) {
-                        return 'fonts/[name].[ext]';
-                    }
-                    return '[name].[ext]';
-                },
-            },
-        },
+        // assetsDir: '', // Do not create an 'assets' folder in 'dist'
+
     },
     plugins: [
         jsToBottomNoModule(),
-        copyFilesPlugin('navbar.html', 'dist'),
-        copyFilesPlugin("js/modernizr-2.6.2.min.js", 'dist/js'),
+        copy2Dist(),
     ],
     publicDir: '', // Not using 'public' directory
 });
