@@ -228,7 +228,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     // Delay the animation for each progress bar
                     setTimeout(function () {
-                        console.log("Animating progress bar for:", wrap.querySelector("h3").innerText);
+                        // console.log("Animating progress bar for:", wrap.querySelector("h3").innerText);
                         progressBar.style.setProperty('--target-width', value + '%');
                         progressBar.classList.add("animate"); // Add the animate class to trigger the animation
                         progressBar.style.width = value + "%"; // Set the target width

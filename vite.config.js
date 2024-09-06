@@ -89,7 +89,6 @@ export default defineConfig({
         // target: 'esnext',
         outDir: 'dist',
         // assetsDir: '', // Do not create an 'assets' folder in 'dist'
-
     },
     plugins: [
         jsToBottomNoModule(),
