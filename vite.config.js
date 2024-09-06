@@ -15,7 +15,7 @@ export default defineConfig({
     build: {
         target: 'esnext', // Ensure ESM output
         outDir: 'dist',
-        assetsDir: 'assets',
+        assetsDir: 'assets', // Output assets to the 'assets' directory
         rollupOptions: {
             input: {
                 main: 'index.html', // Ensure the main entry point is correctly specified
@@ -27,5 +27,5 @@ export default defineConfig({
             },
         },
     },
+    publicDir: 'assets', // Set this to the folder where your static assets are located
 });
-
