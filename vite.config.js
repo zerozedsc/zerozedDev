@@ -1,4 +1,21 @@
 import { defineConfig } from 'vite';
+import { createHtmlPlugin } from 'vite-plugin-html';
+
+const jsToBottomNoModule = () => {
+    return {
+        name: 'move-main-js-to-body',
+        transformIndexHtml(html) {
+            // Remove type="module" from the main script tag and move it to the body
+            let scriptTag = html.match(/<script\s+type="module"\s+crossorigin[^>]*src="\/js\/main\.js"><\/script>/);
+            if (scriptTag) {
+                scriptTag = scriptTag[0]; // Get the actual script tag
+                html = html.replace(scriptTag, ''); // Remove the original script tag from its current location
+                html = html.replace('</body>', `${scriptTag}\n</body>`); // Add the script tag before the closing </body>
+            }
+            return html;
+        }
+    };
+}
 
 export default defineConfig({
     define: {
@@ -13,19 +30,33 @@ export default defineConfig({
         },
     },
     build: {
-        target: 'esnext', // Ensure ESM output
+        target: 'esnext',
         outDir: 'dist',
-        assetsDir: 'assets', // Output assets to the 'assets' directory
+        assetsDir: '', // Do not create an 'assets' folder in 'dist'
         rollupOptions: {
             input: {
-                main: 'index.html', // Ensure the main entry point is correctly specified
+                main: 'index.html', // Use the HTML file as the entry point
             },
             output: {
-                entryFileNames: 'assets/[name].js',
-                chunkFileNames: 'assets/[name].js',
-                assetFileNames: 'assets/[name].[ext]',
+                entryFileNames: 'js/[name].js',
+                chunkFileNames: 'js/[name].js',
+                assetFileNames: (assetInfo) => {
+                    if (assetInfo.name?.endsWith('.css')) {
+                        return 'css/[name].[ext]';
+                    }
+                    if (assetInfo.name?.endsWith('.jpg') || assetInfo.name?.endsWith('.png')) {
+                        return 'images/[name].[ext]';
+                    }
+                    if (assetInfo.name?.endsWith('.eot') || assetInfo.name?.endsWith('.ttf') || assetInfo.name?.endsWith('.woff') || assetInfo.name?.endsWith('.woff2')) {
+                        return 'fonts/[name].[ext]';
+                    }
+                    return '[name].[ext]'; // Default asset path
+                },
             },
         },
     },
-    publicDir: 'assets', // Set this to the folder where your static assets are located
+    plugins: [
+        jsToBottomNoModule()
+    ],
+    publicDir: '', // Not using 'public' directory
 });

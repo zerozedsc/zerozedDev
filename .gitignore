@@ -27,5 +27,7 @@ node_modules/
 # files
 template.html
 firebasecmd.txt
+index.raw.html
+index.test.html
 
 
