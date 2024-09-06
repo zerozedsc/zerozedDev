@@ -1,21 +1,38 @@
 import { defineConfig } from 'vite';
-import { createHtmlPlugin } from 'vite-plugin-html';
+import fs from 'fs';
+import path from 'path';
+
+const copyFilesPlugin = () => {
+    return {
+        name: 'copy-files',
+        closeBundle() {
+            const srcPath = path.resolve(__dirname, 'navbar.html');
+            const destPath = path.resolve(__dirname, 'dist', 'navbar.html');
+
+            if (fs.existsSync(srcPath)) {
+                fs.copyFileSync(srcPath, destPath);
+                console.log('navbar.html copied to dist');
+            } else {
+                console.error('navbar.html not found');
+            }
+        }
+    };
+};
 
 const jsToBottomNoModule = () => {
     return {
         name: 'move-main-js-to-body',
         transformIndexHtml(html) {
-            // Remove type="module" from the main script tag and move it to the body
             let scriptTag = html.match(/<script\s+type="module"\s+crossorigin[^>]*src="\/js\/main\.js"><\/script>/);
             if (scriptTag) {
-                scriptTag = scriptTag[0]; // Get the actual script tag
-                html = html.replace(scriptTag, ''); // Remove the original script tag from its current location
-                html = html.replace('</body>', `${scriptTag}\n</body>`); // Add the script tag before the closing </body>
+                scriptTag = scriptTag[0];
+                html = html.replace(scriptTag, '');
+                html = html.replace('</body>', `${scriptTag}\n</body>`);
             }
             return html;
         }
     };
-}
+};
 
 export default defineConfig({
     define: {
@@ -35,7 +52,7 @@ export default defineConfig({
         assetsDir: '', // Do not create an 'assets' folder in 'dist'
         rollupOptions: {
             input: {
-                main: 'index.html', // Use the HTML file as the entry point
+                main: 'index.html',
             },
             output: {
                 entryFileNames: 'js/[name].js',
@@ -50,13 +67,14 @@ export default defineConfig({
                     if (assetInfo.name?.endsWith('.eot') || assetInfo.name?.endsWith('.ttf') || assetInfo.name?.endsWith('.woff') || assetInfo.name?.endsWith('.woff2')) {
                         return 'fonts/[name].[ext]';
                     }
-                    return '[name].[ext]'; // Default asset path
+                    return '[name].[ext]';
                 },
             },
         },
     },
     plugins: [
-        jsToBottomNoModule()
+        jsToBottomNoModule(),
+        copyFilesPlugin()
     ],
     publicDir: '', // Not using 'public' directory
 });
