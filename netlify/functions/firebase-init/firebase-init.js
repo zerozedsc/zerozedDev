@@ -1,4 +1,4 @@
-// const functions = require('@netlify/functions');
+const functions = require('@netlify/functions');
 const admin = require('firebase-admin');
 
 // Parse the service account credentials from environment variables

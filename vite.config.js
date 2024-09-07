@@ -86,6 +86,7 @@ export default defineConfig({
         },
     },
     build: {
+        sourcemap: false, // Disable source maps generation
         // target: 'esnext',
         outDir: 'dist',
         // assetsDir: '', // Do not create an 'assets' folder in 'dist'
