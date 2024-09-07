@@ -30,5 +30,9 @@ template.html
 firebasecmd.txt
 index.raw.html
 index.test.html
+js/firebase.js
 
 
+
+# Local Netlify folder
+.netlify
