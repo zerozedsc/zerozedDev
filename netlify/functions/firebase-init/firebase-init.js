@@ -1,22 +1,21 @@
 const { Handler } = require('@netlify/functions');
 const admin = require('firebase-admin');
 
-
-
 // Initialize Firebase Admin
 const initializeFirebase = () => {
     try {
-        let serviceAccount = JSON.parse(process.env.VITE_FIREBASE_SERVICE_ACCOUNT);
+        let rawServiceAccount = process.env.VITE_FIREBASE_SERVICE_ACCOUNT;
+        let serviceAccount = JSON.parse(rawServiceAccount);
         if (!admin.apps.length) {
             admin.initializeApp({
                 credential: admin.credential.cert(serviceAccount),
                 databaseURL: process.env.VITE_FIREBASE_DATABASE_URL, // Update with your database URL if required
             });
-            return JSON.stringify({ message: "success initializing Firebase Admin", serviceAccount: serviceAccount, typeServiceAccount: typeof serviceAccount, statusCode: 200 }, null, 4);
+            return JSON.stringify({ message: "success initializing Firebase Admin", statusCode: 200 }, null, 4);
         }
         return JSON.stringify({ message: "Firebase Admin already initialized", statusCode: 200 }, null, 4);
     } catch (error) {
-        return JSON.stringify({ message: `Error initializing Firebase Admin: ${error.message}`, statusCode: 500 }, null, 4);
+        return JSON.stringify({ message: `Error initializing Firebase Admin: ${error.message}`, rawServiceAccount: rawServiceAccount, statusCode: 500 }, null, 4);
     }
 };
 
