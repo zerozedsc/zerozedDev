@@ -5,7 +5,7 @@ const admin = require('firebase-admin');
 const initializeFirebase = () => {
     try {
         const rawServiceAccount = process.env.VITE_FIREBASE_SERVICE_ACCOUNT;
-        let serviceAccount = JSON.parse(rawServiceAccount);
+        const serviceAccount = JSON.parse(rawServiceAccount);
         if (!admin.apps.length) {
             admin.initializeApp({
                 credential: admin.credential.cert(serviceAccount),
@@ -22,7 +22,7 @@ const initializeFirebase = () => {
 // Netlify function handler
 const handler = async (event, context) => {
     try {
-        let message = JSON.stringify({ message: process.env.VITE_FIREBASE_SERVICE_ACCOUNT, statusCode: 500 }, null, 4) //initializeFirebase(); // Ensure Firebase is initialized
+        let message = initializeFirebase(); //JSON.stringify({ message: process.env.VITE_FIREBASE_SERVICE_ACCOUNT, statusCode: 500 }, null, 4)  // Ensure Firebase is initialized
         return {
             statusCode: JSON.parse(message).statusCode,
             body: JSON.stringify({ message: message, }), //check: `${typeof serviceAccount}: ${serviceAccount}` 
