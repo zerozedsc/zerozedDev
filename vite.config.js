@@ -1,6 +1,9 @@
 import { defineConfig } from 'vite';
 const path = require('path');
 const fs = require('fs-extra');
+import { minify } from 'terser';
+import cssnano from 'cssnano';
+import postcss from 'postcss';
 
 const copyFilesPlugin = (filename, distdir) => {
     return {
@@ -22,7 +25,6 @@ const copyFilesPlugin = (filename, distdir) => {
 const rootDir = path.resolve(__dirname);
 const distDir = path.join(rootDir, 'dist');
 
-// List of folders and files to copy
 const itemsToCopy = [
     'css',
     'fonts',
@@ -46,9 +48,37 @@ const copy2Dist = () => {
                     const srcPath = path.join(rootDir, item);
                     const destPath = path.join(distDir, item);
 
-                    // Check if the item is a directory
                     if (fs.lstatSync(srcPath).isDirectory()) {
-                        fs.copySync(srcPath, destPath);
+                        fs.copySync(srcPath, destPath, {
+                            recursive: true,
+                            filter: async (src, dest) => {
+                                if (src.endsWith('.css') || src.endsWith('.js')) {
+                                    const minifiedDestPath = path.join(destPath, path.basename(src));
+
+                                    if (src.endsWith('.js')) {
+                                        // Minify JS
+                                        try {
+                                            const data = await fs.readFile(src, 'utf8');
+                                            const result = await minify(data);
+                                            await fs.writeFile(minifiedDestPath, result.code);
+                                        } catch (err) {
+                                            console.error('Error minifying JS:', err);
+                                        }
+                                    } else if (src.endsWith('.css')) {
+                                        // Minify CSS
+                                        try {
+                                            const css = await fs.readFile(src, 'utf8');
+                                            const result = await postcss([cssnano()]).process(css, { from: src, to: minifiedDestPath });
+                                            await fs.writeFile(minifiedDestPath, result.css);
+                                        } catch (err) {
+                                            console.error('Error minifying CSS:', err);
+                                        }
+                                    }
+                                    return false; // Skip copying the original file
+                                }
+                                return true; // Include all other files
+                            }
+                        });
                     } else {
                         fs.copyFileSync(srcPath, destPath);
                     }
@@ -89,14 +119,13 @@ export default defineConfig({
         },
     },
     build: {
-        sourcemap: false, // Disable source maps generation
-        // target: 'esnext',
+        sourcemap: false,
         outDir: 'dist',
-        // assetsDir: '', // Do not create an 'assets' folder in 'dist'
+        assetsDir: '',
     },
     plugins: [
         jsToBottomNoModule(),
         copy2Dist(),
     ],
-    publicDir: '', // Not using 'public' directory
+    publicDir: '',
 });
