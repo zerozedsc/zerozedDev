@@ -13,7 +13,7 @@ const initializeFirebase = () => {
             });
             return JSON.stringify({ message: "success initializing Firebase Admin", statusCode: 200 }, null, 4);
         }
-        return JSON.stringify({ message: "Firebase Admin already initialized", statusCode: 200 }, null, 4);
+        return JSON.stringify({ message: "Firebase Admin already initialized", statusCode: 200, }, null, 4);
     } catch (error) {
         return JSON.stringify({ message: `Error initializing Firebase Admin: ${error.message}`, rawServiceAccount: rawServiceAccount, statusCode: 500 }, null, 4);
     }
@@ -31,7 +31,7 @@ const handler = async (event, context) => {
         return {
             statusCode: 500,
             body: JSON.stringify({
-                error: 'Failed to initialize Firebase Admin', details: error.message, check: `${typeof rawServiceAccount}: ${rawServiceAccount}`,
+                error: 'Failed to initialize Firebase Admin', details: error.message, //check: `${typeof rawServiceAccount}: ${rawServiceAccount}`
             }),
         };
     }
