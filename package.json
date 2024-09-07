@@ -5,6 +5,7 @@
     "build": "vite build"
   },
   "dependencies": {
+    "@netlify/functions": "^2.8.1",
     "firebase": "^10.13.1",
     "firebase-admin": "^12.4.0"
   },
