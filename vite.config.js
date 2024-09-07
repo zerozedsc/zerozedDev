@@ -31,7 +31,10 @@ const itemsToCopy = [
     'sass',
     'tstex_modules',
     'index.html',
-    'navbar.html'
+    'navbar.html',
+    'google49a38b80c3ef29c3.html',
+    'robots.txt',
+    'sitemap.xml',
 ];
 
 const copy2Dist = () => {
