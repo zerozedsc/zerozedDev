@@ -4,7 +4,7 @@ const admin = require('firebase-admin');
 // Initialize Firebase Admin
 const initializeFirebase = () => {
     try {
-        let rawServiceAccount = process.env.VITE_FIREBASE_SERVICE_ACCOUNT;
+        const rawServiceAccount = process.env.VITE_FIREBASE_SERVICE_ACCOUNT;
         let serviceAccount = JSON.parse(rawServiceAccount);
         if (!admin.apps.length) {
             admin.initializeApp({
