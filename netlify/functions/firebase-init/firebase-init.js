@@ -1,7 +1,7 @@
 const { Handler } = require('@netlify/functions');
 const admin = require('firebase-admin');
 
-// Initialize Firebase Admin
+// Initialize Firebase Admin SDK
 const initializeFirebase = () => {
     try {
         var rawServiceAccount = process.env.VITE_FIREBASE_SERVICE_ACCOUNT;
