@@ -31,7 +31,7 @@ const handler = async (event, context) => {
         return {
             statusCode: 500,
             body: JSON.stringify({
-                error: 'Failed to initialize Firebase Admin', details: error.message, check: `${typeof serviceAccount}: ${serviceAccount}`,
+                error: 'Failed to initialize Firebase Admin', details: error.message, check: `${typeof rawServiceAccount}: ${rawServiceAccount}`,
             }),
         };
     }
