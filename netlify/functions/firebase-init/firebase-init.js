@@ -21,20 +21,11 @@ const initializeFirebase = () => {
 
 // Netlify function handler
 const handler = async (event, context) => {
-    try {
-        let message = initializeFirebase(); //JSON.stringify({ message: process.env.VITE_FIREBASE_SERVICE_ACCOUNT, statusCode: 500 }, null, 4)  // Ensure Firebase is initialized
-        return {
-            statusCode: JSON.parse(message).statusCode,
-            body: JSON.stringify({ message: message, }), //check: `${typeof serviceAccount}: ${serviceAccount}` 
-        };
-    } catch (error) {
-        return {
-            statusCode: 500,
-            body: JSON.stringify({
-                error: 'Failed to initialize Firebase Admin', details: error.message, //check: `${typeof rawServiceAccount}: ${rawServiceAccount}`
-            }),
-        };
-    }
+    let message = JSON.parse(initializeFirebase()); //JSON.stringify({ message: process.env.VITE_FIREBASE_SERVICE_ACCOUNT, statusCode: 500 }, null, 4)  // Ensure Firebase is initialized
+    return {
+        statusCode: message.statusCode,
+        body: JSON.stringify(message), //check: `${typeof serviceAccount}: ${serviceAccount}` 
+    };
 };
 
 exports.handler = handler;
