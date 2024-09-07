@@ -31,6 +31,7 @@ const itemsToCopy = [
     'images',
     'js',
     'sass',
+    'data',
     'tstex_modules',
     'index.html',
     'navbar.html',
