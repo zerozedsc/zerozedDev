@@ -1,10 +1,10 @@
-const functions = require('@netlify/functions');
+// const functions = require('@netlify/functions');
 const admin = require('firebase-admin');
 
 // Parse the service account credentials from environment variables
 // warning for json problem
-let serviceAccount;
 try {
+    let serviceAccount;
     serviceAccount = JSON.parse(process.env.VITE_FIREBASE_SERVICE_ACCOUNT);
 
     // Initialize Firebase Admin if it's not already initialized
