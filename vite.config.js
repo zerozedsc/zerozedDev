@@ -35,6 +35,7 @@ const itemsToCopy = [
     'tstex_modules',
     'index.html',
     'navbar.html',
+    'blog.html',
     'google49a38b80c3ef29c3.html',
     'robots.txt',
     'sitemap.xml',

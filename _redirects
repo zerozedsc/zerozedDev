@@ -1,0 +1,9 @@
+# Redirect index.html to /
+/index.html  /  301
+
+# Redirect blog.html to /blog
+/blog.html  /blog  301
+
+# Redirect all other URLs to their corresponding .html files
+/blog  /blog.html  200
+/  /index.html  200
