@@ -39,6 +39,7 @@ const itemsToCopy = [
     'google49a38b80c3ef29c3.html',
     'robots.txt',
     'sitemap.xml',
+    '_redirects',
 ];
 
 const copy2Dist = () => {
