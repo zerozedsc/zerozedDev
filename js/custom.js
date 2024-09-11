@@ -151,26 +151,26 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 // Change picture of colorlib-counter when in mobile device
-document.addEventListener("DOMContentLoaded", function () {
-    function isMobileDevice() {
-        return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1) || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    }
+// document.addEventListener("DOMContentLoaded", function () {
+//     function isMobileDevice() {
+//         return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1) || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+//     }
 
-    function updateBackgroundImage() {
-        const counterDiv = document.getElementById('colorlib-counter');
-        if (window.matchMedia("(orientation: portrait)").matches) {
-            counterDiv.style.backgroundImage = "url('images/cover_bg_1mobile.jpg')";
-        } else {
-            counterDiv.style.backgroundImage = "url('images/cover_bg_1.jpg')";
-        }
-    }
+//     function updateBackgroundImage() {
+//         const counterDiv = document.getElementById('colorlib-counter');
+//         if (window.matchMedia("(orientation: portrait)").matches) {
+//             counterDiv.style.backgroundImage = "url('images/cover_bg_1mobile.jpg')";
+//         } else {
+//             counterDiv.style.backgroundImage = "url('images/cover_bg_1.jpg')";
+//         }
+//     }
 
-    if (isMobileDevice()) {
-        updateBackgroundImage();
-        window.addEventListener("resize", updateBackgroundImage);
-        window.addEventListener("orientationchange", updateBackgroundImage);
-    }
-});
+//     if (isMobileDevice()) {
+//         updateBackgroundImage();
+//         window.addEventListener("resize", updateBackgroundImage);
+//         window.addEventListener("orientationchange", updateBackgroundImage);
+//     }
+// });
 
 // Experience section folding
 function toggleVisibility(element) {
@@ -251,3 +251,41 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
+
+
+// animation related function
+function runAnimateBox() {
+    var i = 0;
+    $('.animate-box').waypoint(function (direction) {
+
+        if (direction === 'down' && !$(this.element).hasClass('animated')) {
+
+            i++;
+
+            $(this.element).addClass('item-animate');
+            setTimeout(function () {
+
+                $('body .animate-box.item-animate').each(function (k) {
+                    var el = $(this);
+                    setTimeout(function () {
+                        var effect = el.data('animate-effect');
+                        if (effect === 'fadeIn') {
+                            el.addClass('fadeIn animated');
+                        } else if (effect === 'fadeInLeft') {
+                            el.addClass('fadeInLeft animated');
+                        } else if (effect === 'fadeInRight') {
+                            el.addClass('fadeInRight animated');
+                        } else {
+                            el.addClass('fadeInUp animated');
+                        }
+
+                        el.removeClass('item-animate');
+                    }, k * 200, 'easeInOutExpo');
+                });
+
+            }, 100);
+
+        }
+
+    }, { offset: '85%' });
+};

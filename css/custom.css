@@ -1,0 +1,76 @@
+#editor-container button {
+    position: relative;
+    left: 80%;
+}
+
+.content-panel h3 {
+    line-height: 20%;
+}
+
+
+@media screen and (max-width: 550px) {
+    .blog-row {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        /* Aligns the item at the top */
+        padding-top: 10px;
+        /* Add padding to ensure it doesn't overlap with the top */
+        text-align: center;
+        /* Ensures the text is centered */
+    }
+
+    .blog-heading {
+        margin: 0 auto;
+        /* Center the element horizontally */
+        max-width: 55%;
+        /* Ensure it doesn't overflow horizontally */
+        word-wrap: break-word;
+        /* Break long words if necessary */
+    }
+
+    #editor-container button {
+        position: relative;
+        left: 70%;
+    }
+
+    .content-panel h3 {
+        margin-bottom: 4%;
+    }
+
+    .content-panel h3 {
+        word-wrap: break-word;
+        /* Allows long words to be broken and wrapped onto the next line */
+        overflow-wrap: break-word;
+        /* Ensures long words break and wrap onto the next line */
+        white-space: normal;
+        /* Ensures text wraps normally */
+        line-height: 1.2;
+        /* Adjust line height for better readability */
+    }
+
+
+}
+
+
+.justify-content-center {
+    display: flex;
+    justify-content: center;
+}
+
+.sidebyside {
+    display: flex;
+    align-items: center;
+    /* Align items vertically centered */
+}
+
+.sidebyside label {
+    margin-right: 10px;
+    /* Add some space between the label and the select input */
+}
+
+.sidebyside select {
+    width: 60px;
+    height: 3.9rem;
+    /* Set the width to accommodate two numbers */
+}
