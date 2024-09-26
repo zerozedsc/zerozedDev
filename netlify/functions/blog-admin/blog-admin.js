@@ -2,8 +2,13 @@ const { Handler } = require('@netlify/functions');
 const admin = require('firebase-admin');
 const jwt = require('jsonwebtoken');
 
+// admin constant
 const BLOG_PASSKEY = process.env.BLOG_PASSKEY
 const SECRET_KEY = "Wadghlkas80SfASn20As22"; // Change to a secure key, store this in environment variables (process.env.SECRET_KEY)
+
+// blog view constant
+const BLOG_REQUEST_LIMIT = 10; // Limit the number of blog requests per user    
+const BLOG_REQ_KEY = "Srt2SDF2r2rsf12fgdq09t"; // Key
 
 // Initialize Firebase Admin SDK
 const initializeFirebase = () => {
@@ -471,34 +476,45 @@ const handler = async function (event, context) {
     }
 
     // For Generating Blog Summary
-    if (type === 'blog-summary') {
-        const content = await getBlogSummary();
-        return {
-            statusCode: content.statusCode,
-            body: JSON.stringify({ message: content.message, statusCode: content.statusCode, data: JSON.parse(content.body), }),
-        }
-    }
-
-    // For Generating Blog Detail
-    if (type === 'blog-detail' && id) {
+    if (type === 'blog-content') {
         try {
-            const blogDetail = await getBlogDetail(id); // Implement this function
+            if (token) {
+                const decoded = jwt.verify(token, BLOG_REQ_KEY);
+                if (decoded.role === 'blog-content') {
+                    return {
+                        statusCode: 200,
+                        body: JSON.stringify({ message: "Loaded" }),
+                    };
+                }
+
+            }
+
+            const token = jwt.sign({ role: 'blog-content' }, BLOG_REQ_KEY, { expiresIn: '2h' });
+            const blogContent = await getBlogContent(); // Implement this function
             return {
                 statusCode: 200,
-                body: JSON.stringify(blogDetail),
+                body: JSON.stringify({ message: "Success", data: JSON.parse(blogContent), token }),
             };
         } catch (error) {
             return {
                 statusCode: 500,
-                body: JSON.stringify({ message: "Error fetching blog detail" }),
+                body: JSON.stringify({ message: "Error fetching blog summary", error }),
             };
         }
     }
+
 
     return {
         statusCode: 400,
         body: JSON.stringify({ message: "Invalid request for type: " + type }),
     };
 };
+
+
+async function getBlogContent() {
+    // Replace with actual Firebase Realtime Database logic
+    return { content: `Blog Content` };
+}
+
 
 exports.handler = handler;
