@@ -25,6 +25,14 @@ async function getBlogContent(token) {
     }
 }
 
+function generateSummary(text, sentenceCount = 3) {
+    const sentences = text.match(/[^\.!\?]+[\.!\?]+/g); // Split text into sentences
+    if (sentences && sentences.length > 0) {
+        return sentences.slice(0, sentenceCount).join(' '); // Return first n sentences
+    }
+    return '';
+}
+
 async function submitContent(token, data) {
     try {
         const response = await fetch('/.netlify/functions/blog-admin', {
@@ -218,7 +226,7 @@ async function generateAdminHTML(token) {
         const index_pos = (blogRawData.length - 1).toString();
         const index_obj = blogRawData[index_pos];
         delete blogRawData[index_pos];
-        console.log(index_obj);
+        // console.log(index_obj);
 
         var c = 1;
         for (const key in blogRawData) {
@@ -248,7 +256,7 @@ async function generateAdminHTML(token) {
         const year = date.getFullYear();
         const formattedDate = `${day}-${month}-${year}`;
         const doc_name = `${month}_${year}`;
-        console.log(formattedDate, doc_name, index_obj.data.ID);
+        // console.log(formattedDate, doc_name, index_obj.data.ID);
 
         submitButton.addEventListener('click', async function () {
             const contentTitle = document.getElementById('editor-title');
@@ -268,7 +276,8 @@ async function generateAdminHTML(token) {
                     CONTENT: contentText,
                     LIKES: 0,
                     STATUS: "PENDING",
-                    DATE: formattedDate, // Ensure formattedDate is defined
+                    DATE: formattedDate,
+                    SUMMARY: generateSummary(contentText, 2),// Ensure formattedDate is defined
                 },
                 doc_name: doc_name,
             };
@@ -470,7 +479,59 @@ if (window.location.search.includes("content=admin")) {
 
 }
 
+async function getBlogSummary() {
+    try {
+        // Fetch blog content from the server
+        const response = await fetch(`/.netlify/functions/blog-admin?type=blog-summary`);
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const raw = await response.json();
+        const data = raw.data;
+
+        if (data && data.message === "Success") {
+            return data.data; // Return the blog content data
+        } else {
+            console.error("Error getting blog summary:", data.message);
+            swal("Error getting blog summary", data.message, "error");
+            return { message: "Error getting blog summary: " + data.message };
+        }
+    } catch (e) {
+        console.error("Error getting blog summary:", e);
+        swal("Error", "Error getting blog summary. Please try again\n" + e, "error");
+        return { message: "Error getting blog summary: " + e.message };
+    }
+}
+
+async function generateBlogEntry() {
+    const recent_blog = document.getElementById('recent-blog');
+    const blog_summary = await getBlogSummary();
+    const blog_data = blog_summary.data;
+
+    for (const key in blog_data) {
+        if (blog_data.hasOwnProperty(key)) {
+            const item = blog_data[key];
+            const blog_entry = document.createElement('div');
+            blog_entry.className = 'col-md-4 animate-box';
+            blog_entry.innerHTML = `<div class="blog-entry">
+            <a href="${item.URL}" class="blog-img"><img src="${item.IMAGE}" class="img-responsive" alt=""></a>
+            <div class="desc">
+                <p class="meta"><span class="day">${item.DATE}</span><span class="month">${item.MONTH}</span></p>
+                <h2><a href="${item.URL}">${item.TITLE}</a></h2>
+                <p>${item.DESCRIPTION}</p>
+            </div>
+        </div>`;
+            recent_blog.appendChild(blog_entry);
+        }
+    }
+}
+
 // editor content submit function
+if (window.location.pathname === "/" || window.location.pathname === "/index.html") {
+    // generateBlogEntry();
+}
 
 
 

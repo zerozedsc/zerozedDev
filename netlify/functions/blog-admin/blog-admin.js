@@ -203,6 +203,132 @@ const uploadBlog = async (blogData) => {
     }
 };
 
+// Check Cache Update
+const getCacheTimestamp = async () => {
+    try {
+        const firestore = admin.firestore();
+        const cacheRef = firestore.collection('cache').doc('UPDATE');
+        const doc = await cacheRef.get();
+        return doc.exists ? doc.data().TIMESTAMP.toDate() : null;
+    } catch (error) {
+        return { statusCode: 500, message: `Error fetching cache timestamp: ${error.message}` };
+    }
+};
+
+// Cache Blog Data
+const cacheBlogData = async (data) => {
+    try {
+        const firebaseInit = JSON.parse(initializeFirebase());
+
+        if (firebaseInit.statusCode !== 200) {
+            return {
+                statusCode: firebaseInit.statusCode,
+                body: JSON.stringify(firebaseInit),
+            };
+        }
+
+        const cacheKey = 'blogSummaryCache';
+        const cacheDuration = 60 * 60 * 24; // 24 hours
+        const cacheOptions = { expirationTtl: cacheDuration };
+
+        const cache = await caches.open('netlify');
+        await cache.put(cacheKey, new Response(JSON.stringify(data), {
+            headers: { 'Content-Type': 'application/json' }
+        }), cacheOptions);
+
+        return { statusCode: 200, message: "Data cached successfully" };
+    } catch (error) {
+        return { statusCode: 500, message: `Error caching blog data: ${error.message}` };
+    }
+};
+
+// Get Cached Blog Data
+const getBlogCache = async () => {
+    try {
+        const cacheKey = 'blogSummaryCache';
+        const cache = await caches.open('netlify');
+        const cachedResponse = await cache.match(cacheKey);
+        if (cachedResponse) {
+            const data = await cachedResponse.json();
+            return { statusCode: 200, data };
+        }
+        return { statusCode: 404, message: "No cached data found" };
+    } catch (error) {
+        return { statusCode: 500, message: `Error retrieving cached blog data: ${error.message}` };
+    }
+};
+
+
+const getBlogSummary = async () => {
+    try {
+        // Initialize Firebase
+        const firebaseInit = JSON.parse(initializeFirebase());
+        if (firebaseInit.statusCode !== 200) {
+            return {
+                statusCode: firebaseInit.statusCode,
+                body: JSON.stringify(firebaseInit),
+            };
+        }
+
+        // Get the current cache timestamp
+        const cacheTimestamp = await getCacheTimestamp();
+
+        // Check if cached data exists and if it's still valid
+        const cachedDataResult = await getBlogCache();
+        if (cachedDataResult.statusCode === 200 && cachedDataResult.data) {
+            console.log('[blog-cdn] Returning cached blog data');
+            return {
+                statusCode: 200,
+                body: JSON.stringify(cachedDataResult.data),
+            };
+        }
+
+        // If no cache or cache is invalid, fetch blog data from Firestore
+        const blogDataResult = await getBlogData();
+        if (blogDataResult.statusCode !== 200) {
+            return {
+                statusCode: blogDataResult.statusCode,
+                body: JSON.stringify(blogDataResult),
+            };
+        }
+
+        const blogData = JSON.parse(blogDataResult.body).data; // Parse the blog data from Firestore
+
+        // Add cache timestamp to the blog data
+        const blogDataWithCacheTimestamp = {
+            cacheTimestamp: cacheTimestamp,
+            blogSummary: blogData
+        };
+
+        // Cache the blog data with the timestamp
+        const cacheResult = await cacheBlogData(blogDataWithCacheTimestamp);
+        if (cacheResult.statusCode !== 200) {
+            return {
+                statusCode: cacheResult.statusCode,
+                body: JSON.stringify({ message: cacheResult.message }),
+            };
+        }
+
+        // Return the fetched blog data
+        return {
+            statusCode: 200,
+            body: JSON.stringify({ message: "Blog summary fetched", data: blogDataWithCacheTimestamp }),
+        };
+
+    } catch (error) {
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ message: `Error fetching blog summary: ${error.message}` }),
+        };
+    }
+};
+
+
+const getBlogDetail = async (id) => {
+    // Replace with actual Firebase Realtime Database logic
+    return { detail: `Blog detail for ID ${id}` };
+
+}
 
 // Netlify function handler
 const handler = async function (event, context) {
@@ -346,17 +472,10 @@ const handler = async function (event, context) {
 
     // For Generating Blog Summary
     if (type === 'blog-summary') {
-        try {
-            const blogSummary = await getBlogSummary(); // Implement this function
-            return {
-                statusCode: 200,
-                body: JSON.stringify(blogSummary),
-            };
-        } catch (error) {
-            return {
-                statusCode: 500,
-                body: JSON.stringify({ message: "Error fetching blog summary" }),
-            };
+        const content = await getBlogSummary();
+        return {
+            statusCode: content.statusCode,
+            body: JSON.stringify({ message: content.message, statusCode: content.statusCode, data: JSON.parse(content.body), }),
         }
     }
 
@@ -381,17 +500,5 @@ const handler = async function (event, context) {
         body: JSON.stringify({ message: "Invalid request for type: " + type }),
     };
 };
-
-// Mock functions for Firebase interaction (implement these)
-async function getBlogSummary() {
-    // Replace with actual Firebase Realtime Database logic
-    return { summary: "Blog summary data" };
-}
-
-async function getBlogDetail(id) {
-    // Replace with actual Firebase Realtime Database logic
-    return { detail: `Blog detail for ID ${id}` };
-}
-
 
 exports.handler = handler;
