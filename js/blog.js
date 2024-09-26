@@ -7,23 +7,23 @@ async function getBlogContent(token) {
         )
 
         if (!response.ok) {
-            throw new Error('Network response was not ok')
+            throw new Error('Network response was not ok');
         }
 
-        const raw = await response.json()
-        const data = raw.data
+        const raw = await response.json();
+        const data = raw.data;
 
         if (data && data.message === 'Success') {
-            return data.data // Return the blog content data
+            return { data: data.data, status: data.message } // Return the blog content data
         } else {
-            console.error('Error getting blog content:', data.message)
-            swal('Error getting blog content', data.message, 'error')
-            return { message: 'Error getting blog content: ' + data.message }
+            console.error('Error getting blog content:', data.message);
+            swal('Error getting blog content', data.message, 'error');
+            return { message: 'Error getting blog content: ' + data.message, status: 'error' }
         }
     } catch (e) {
-        console.error('Error getting blog content:', e)
-        swal('Error', 'Error getting blog content. Please try again\n' + e, 'error')
-        return { message: 'Error getting blog content: ' + e.message }
+        console.error('Error getting blog content:', e);
+        swal('Error', 'Error getting blog content. Please try again\n' + e, 'error');
+        return { message: 'Error getting blog content: ' + e.message, status: 'error' }
     }
 }
 
@@ -254,29 +254,35 @@ async function generateAdminHTML(token) {
         })
 
         // number max 6
-        const blogRawData = await getBlogContent(token)
-        const index_pos = (blogRawData.length - 1).toString()
-        const index_obj = blogRawData[index_pos]
-        delete blogRawData[index_pos]
-        console.log(index_obj)
+        const blogRawGet = await getBlogContent(token)
+        if (blogRawGet.status === 'error') {
+            swal('Error', blogRawGet.message, 'error')
+        }
+        else {
+            const blogRawData = blogRawGet.data;
+            const index_pos = (blogRawData.length - 1).toString()
+            const index_obj = blogRawData[index_pos]
+            delete blogRawData[index_pos]
+            // console.log(index_obj)
 
-        var c = 1
-        for (const key in blogRawData) {
-            if (blogRawData.hasOwnProperty(key)) {
-                const item = blogRawData[key].data
-                for (const a in item) {
-                    generateContentCard(
-                        (c % 6) + 1,
-                        a,
-                        item[a].TITLE,
-                        item[a].LIKES,
-                        item[a].DATE,
-                        `showDetail(${JSON.stringify(item[a])})`,
-                        item[a].STATUS,
-                        `adjustContent(${JSON.stringify(item[a])})`
-                    )
-                    c++
-                    // console.log(item[a]);
+            var c = 1
+            for (const key in blogRawData) {
+                if (blogRawData.hasOwnProperty(key)) {
+                    const item = blogRawData[key].data
+                    for (const a in item) {
+                        generateContentCard(
+                            (c % 6) + 1,
+                            a,
+                            item[a].TITLE,
+                            item[a].LIKES,
+                            item[a].DATE,
+                            `showDetail(${JSON.stringify(item[a])})`,
+                            item[a].STATUS,
+                            `adjustContent(${JSON.stringify(item[a])})`
+                        )
+                        c++
+                        // console.log(item[a]);
+                    }
                 }
             }
         }
@@ -289,7 +295,7 @@ async function generateAdminHTML(token) {
         const year = date.getFullYear()
         const formattedDate = `${day}-${month}-${year}`
         const doc_name = `${month}_${year}`
-        console.log(formattedDate, doc_name, index_obj.data.ID)
+        // console.log(formattedDate, doc_name, index_obj.data.ID)
 
         submitButton.addEventListener('click', async function () {
             const contentTitle = document.getElementById('editor-title')
@@ -485,54 +491,54 @@ function arrangeChildrenInColumns(parent_container_name, col_n) {
     }
 }
 
-async function getBlogContent() {
-    try {
-        let blog_token = localStorage.getItem('blogToken')
+// async function getBlogContent() {
+//     try {
+//         let blog_token = localStorage.getItem('blogToken')
 
-        if (!blog_token) {
-            const response = await fetch('/.netlify/functions/blog-admin', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    type: 'blog-content'
-                })
-            })
-            const data = await response.json()
+//         if (!blog_token) {
+//             const response = await fetch('/.netlify/functions/blog-admin', {
+//                 method: 'POST',
+//                 headers: { 'Content-Type': 'application/json' },
+//                 body: JSON.stringify({
+//                     type: 'blog-content'
+//                 })
+//             })
+//             const data = await response.json()
 
-            if (data.message === 'Success') {
-                localStorage.setItem('blogToken', blog_token)
-                localStorage.setItem('blogContent', JSON.stringify(data.data))
-                return { data: data.data, status: 'success' }
-            } else {
-                throw new Error('Failed to fetch blog content')
-            }
+//             if (data.message === 'Success') {
+//                 localStorage.setItem('blogToken', blog_token)
+//                 localStorage.setItem('blogContent', JSON.stringify(data.data))
+//                 return { data: data.data, status: 'success' }
+//             } else {
+//                 throw new Error('Failed to fetch blog content')
+//             }
 
-        }
+//         }
 
-        const response = await fetch('/.netlify/functions/blog-admin', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                type: 'blog-content',
-                token: blog_token,
-            })
-        })
-        const data = await response.json()
+//         const response = await fetch('/.netlify/functions/blog-admin', {
+//             method: 'POST',
+//             headers: { 'Content-Type': 'application/json' },
+//             body: JSON.stringify({
+//                 type: 'blog-content',
+//                 token: blog_token,
+//             })
+//         })
+//         const data = await response.json()
 
-        if (data.message === 'Loaded') {
-            let blog_content = JSON.parse(localStorage.getItem('blogContent'))
-            return { data: blog_content, status: 'success' }
-        }
+//         if (data.message === 'Loaded') {
+//             let blog_content = JSON.parse(localStorage.getItem('blogContent'))
+//             return { data: blog_content, status: 'success' }
+//         }
 
 
-    } catch (e) {
-        console.error('Error getting blog content:', e)
-        swal('Error', 'Error getting blog content. Please try again\n' + e, 'error')
-        return {
-            message: 'Error getting blog content: ' + e, status: 'error'
-        }
-    }
-}
+//     } catch (e) {
+//         console.error('Error getting blog content:', e)
+//         swal('Error', 'Error getting blog content. Please try again\n' + e, 'error')
+//         return {
+//             message: 'Error getting blog content: ' + e, status: 'error'
+//         }
+//     }
+// }
 
 async function blogView() {
     try {
