@@ -14,16 +14,16 @@ async function getBlogContent(token) {
         const data = raw.data;
 
         if (data && data.message === 'Success') {
-            return { data: data.data, status: data.message } // Return the blog content data
+            return { data: data.data, status: data.message, cache: data.cacheStatus } // Return the blog content data
         } else {
             console.error('Error getting blog content:', data.message);
             swal('Error getting blog content', data.message, 'error');
-            return { message: 'Error getting blog content: ' + data.message, status: 'error' }
+            return { message: 'Error getting blog content: ' + data.message, status: 'error', cache: data.cacheStatus }
         }
     } catch (e) {
         console.error('Error getting blog content:', e);
         swal('Error', 'Error getting blog content. Please try again\n' + e, 'error');
-        return { message: 'Error getting blog content: ' + e.message, status: 'error' }
+        return { message: 'Error getting blog content: ' + e.message, status: 'error', cache: data.cacheStatus }
     }
 }
 

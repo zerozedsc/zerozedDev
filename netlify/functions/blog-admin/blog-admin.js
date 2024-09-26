@@ -9,6 +9,7 @@ const SECRET_KEY = "Wadghlkas80SfASn20As22"; // Change to a secure key, store th
 // blog view constant
 const BLOG_REQUEST_LIMIT = 10; // Limit the number of blog requests per user    
 const BLOG_REQ_KEY = "Srt2SDF2r2rsf12fgdq09t"; // Key
+const cacheTTL = 60 * 60; // Cache TTL: 1 hour
 
 // Initialize Firebase Admin SDK
 const initializeFirebase = () => {
@@ -82,6 +83,29 @@ const getAllDocumentsInCollection = async (collectionName) => {
 // blog-data main function
 const getBlogData = async () => {
     try {
+        let checkCache = false;
+
+        try {
+            const cacheResult = await getBlogCache();
+            if (cacheResult.statusCode === 200) {
+                checkCache = true;
+                const blogData = cacheResult.data.blogdata;
+                return {
+                    statusCode: 200,
+                    body: JSON.stringify({ message: "Success", data: blogData, cacheStatus: checkCache }),
+                };
+            }
+            checkCache =
+                cacheResult.statusCode === 404 ? "No cache found: " + cacheResult.message :
+                    cacheResult.statusCode === 500 ? "Error fetching cache: " + cacheResult.message :
+                        "Unknown error: " + cacheResult.message;
+
+        }
+        catch (error) {
+            checkCache = error;
+        };
+
+
         const firebaseInit = JSON.parse(initializeFirebase()); // no need to parse
 
         if (firebaseInit.statusCode !== 200) {
@@ -109,10 +133,10 @@ const getBlogData = async () => {
         }
         const blogCollection = collectionList.data.includes('blogs') ? 'blogs' : '';
         const documentList = blogCollection ? await getAllDocumentsInCollection(blogCollection) : { message: "Collection not found", statusCode: 404 };
-
+        cacheBlogData(JSON.stringify({ blogdata: documentList.data }));
         return {
             statusCode: documentList.statusCode,
-            body: JSON.stringify({ message: "Success", data: documentList.data }),
+            body: JSON.stringify({ message: "Success", data: documentList.data, cacheStatus: checkCache }),
         };
 
 
@@ -120,12 +144,15 @@ const getBlogData = async () => {
     catch (error) {
         return {
             statusCode: 500,
-            body: JSON.stringify({ message: `Error fetching blog data: ${error.message}` }),
+            body: JSON.stringify({ message: `Error fetching blog data: ${error.message}`, cacheStatus: checkCache }),
         };
     }
 }
 
 // upload-blog main function
+/**
+@param { Object } blogData
+*/
 const uploadBlog = async (blogData) => {
     try {
         const firebaseInit = JSON.parse(initializeFirebase());
@@ -221,6 +248,9 @@ const getCacheTimestamp = async () => {
 };
 
 // Cache Blog Data
+/**
+@param { Object } data
+*/
 const cacheBlogData = async (data) => {
     try {
         const firebaseInit = JSON.parse(initializeFirebase());
@@ -232,8 +262,8 @@ const cacheBlogData = async (data) => {
             };
         }
 
-        const cacheKey = 'blogSummaryCache';
-        const cacheDuration = 60 * 60 * 24; // 24 hours
+        const cacheKey = BLOG_REQ_KEY;
+        const cacheDuration = cacheTTL;
         const cacheOptions = { expirationTtl: cacheDuration };
 
         const cache = await caches.open('netlify');
@@ -250,7 +280,7 @@ const cacheBlogData = async (data) => {
 // Get Cached Blog Data
 const getBlogCache = async () => {
     try {
-        const cacheKey = 'blogSummaryCache';
+        const cacheKey = BLOG_REQ_KEY;
         const cache = await caches.open('netlify');
         const cachedResponse = await cache.match(cacheKey);
         if (cachedResponse) {
