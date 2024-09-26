@@ -628,16 +628,15 @@ async function checkAdminAccess() {
     }
 }
 
-// Admin run code
-if (window.location.search.includes('content=admin')) {
-    checkAdminAccess()
-}
-else {
-    blogView()
-}
 // editor content submit function
-if (window.location.pathname === "/" || window.location.pathname === "/index.html") {
-    // generateBlogEntry();
+if (window.location.pathname === "/blog") {
+    // Admin run code
+    if (window.location.search.includes('content=admin')) {
+        checkAdminAccess()
+    }
+    else {
+        blogView()
+    }
 }
 
 
